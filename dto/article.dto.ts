@@ -1,6 +1,7 @@
 export interface CreateArticleInputs {
-    title: string;
+    author: string;
     image: string;
-    content: string;
+    title: string;
     category: string;
+    content: string;
 }

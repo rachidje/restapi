@@ -1,20 +1,31 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 
-interface ArticleDoc extends Document {
-    title: string;
+interface Article {
+    author: string;
     image: string;
-    content: string;
+    title: string;
     category: string;
+    content: string;
 }
 
-const ArticleSchaema = new Schema({
-    title: {type: String, required: true},
+const ArticleSchema = new Schema<Article & Document>({
+    author: {type: String, required: true},
     image: {type: String, required: true},
-    content: {type: String, required: true},
-    category: {type: String, required: true}
-})
+    title: {type: String, required: true},
+    category: {type: String, required: true},
+    content: {type: String, required: true}
+}, {
+    timestamps: true,
+    autoCreate: false,
+    autoIndex: false,
+    toJSON: {
+        transform: function (doc, ret) {
+            delete ret.updatedAt;
+            delete ret.__v;
+        }
+    
+    }
+});
 
-const Article = mongoose.model<ArticleDoc>("article", ArticleSchaema);
-
-export { Article, ArticleDoc }
+export const ArticleModel = mongoose.model<Article & Document>("article", ArticleSchema);
