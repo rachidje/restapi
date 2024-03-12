@@ -16,3 +16,21 @@ Exemple de body
 ```
 
 Creer un nouvel article dans une collection qui portera le nom de l'utilisateur
+
+`GET /api/v1/:user`
+Recupere l'ensemble des articles
+
+`GET /api/v1/:user/:id`
+Recupere l'article via son ID
+
+`PATCH /api/v1/:user/:id`
+Met a jour l'article
+Exemple de body
+```
+{
+    'title': string,
+    'image': string,
+    'content': string,
+    'category': string
+}
+```
