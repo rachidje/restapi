@@ -115,7 +115,7 @@ export const updateArticle = async (req: Request, res: Response, next: NextFunct
 
         const updatedArticle = new ArticleModel(await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)}));
 
-        return res.status(200).json({success: true, data: updatedArticle, error: null})
+        return res.status(200).json(updatedArticle)
     } catch (error) {
         next(error)
     }
