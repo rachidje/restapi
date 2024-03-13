@@ -85,7 +85,7 @@ export const getArticleById = async (req: Request, res: Response, next: NextFunc
         if(!article) {
             return res.status(404).json({error: "Article introuvable"})
         }
-        return res.status(200).json({success: true, data: new ArticleModel(article), error: null})
+        return res.status(200).json(new ArticleModel(article))
     } catch (error) {
         next(error)
     }
