@@ -20,6 +20,12 @@ Creer un nouvel article dans une collection qui portera le nom de l'utilisateur
 `GET /api/v1/:user`
 Recupere l'ensemble des articles
 
+`GET /api/v1/:user?sort=asc`
+Recupere l'ensemble des articles du plus ancien au plus recent
+
+`GET /api/v1/:user?sort=desc`
+Recupere l'ensemble des articles du plus recent au plus ancien
+
 `GET /api/v1/:user/:id`
 Recupere l'article via son ID
 

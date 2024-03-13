@@ -42,7 +42,25 @@ export const getAllArticles = async (req: Request, res: Response, next: NextFunc
             return res.status(404).json({error: "Collection introuvable"})
         }
 
-        const articles = await mongoose.connection.db.collection(user).find({}).toArray();
+        let articles;
+
+        const sortBy: any = req.query.sort;
+        if (sortBy) {
+            articles = await mongoose.connection.db
+                                .collection(user)
+                                .find({})
+                                .sort({"createdAt": sortBy})
+                                .toArray()
+                                .then((articles: any) => articles.map((article: any) => new ArticleModel(article)));
+        } else {
+            articles = await mongoose.connection.db
+                                .collection(user)
+                                .find({})
+                                .toArray()
+                                .then((articles: any) => articles.map((article: any) => new ArticleModel(article)))
+                                ;
+        }
+
         return res.status(200).json({success: true, data: articles, error: null})
     } catch (error) {
         next(error)
@@ -63,8 +81,11 @@ export const getArticleById = async (req: Request, res: Response, next: NextFunc
             return res.status(404).json({error: "Collection introuvable"})
         }
 
-        const article = new ArticleModel(await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)}));
-        return res.status(200).json({success: true, data: article, error: null})
+        const article = await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)});
+        if(!article) {
+            return res.status(404).json({error: "Article introuvable"})
+        }
+        return res.status(200).json({success: true, data: new ArticleModel(article), error: null})
     } catch (error) {
         next(error)
     }
@@ -95,6 +116,33 @@ export const updateArticle = async (req: Request, res: Response, next: NextFunct
         const updatedArticle = new ArticleModel(await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)}));
 
         return res.status(200).json({success: true, data: updatedArticle, error: null})
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const deleteArticle = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {user, id} = req.params;
+
+        if(!user) {
+            return res.status(400).json({error: "Nom de collection manquant"})
+        }
+
+        const collectionExist = await mongoose.connection.db.listCollections({name: user}).hasNext()
+
+        if(!collectionExist) {
+            return res.status(404).json({error: "Collection introuvable"})
+        }
+
+        const article = await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)});
+        if(!article) {
+            return res.status(404).json({error: "Article introuvable"})
+        }
+
+        await mongoose.connection.db.collection(user).deleteOne({_id: new mongoose.Types.ObjectId(id)});
+
+        return res.status(200).json({success: true, data: null, error: null})
     } catch (error) {
         next(error)
     }
