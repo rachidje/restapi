@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import { CreateArticleInputs } from "../dto";
 import { ArticleModel } from "../database/models/article.model";
+import { collectionIsCreated, fetchArticle } from "../database/queries/article.querirs";
 
 
 export const createNewArticle = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,15 +15,13 @@ export const createNewArticle = async (req: Request, res: Response, next: NextFu
             return res.status(400).json({error: "Nom de collection manquant"})
         }
 
-        const collectionExist = await mongoose.connection.db.listCollections({name: user}).hasNext()
-
-        if(!collectionExist) {
+        if(!collectionIsCreated(user)) {
             await mongoose.connection.db.createCollection(user);
         }
 
         const newArticle = await ArticleModel.create({...body});
         await mongoose.connection.db.collection(user).insertOne(newArticle);
-        return res.status(201).json({success: true, data: newArticle, error: null})
+        return res.status(201).json(newArticle)
     } catch (error) {
         next(error)
     }
@@ -36,9 +35,7 @@ export const getAllArticles = async (req: Request, res: Response, next: NextFunc
             return res.status(400).json({error: "Nom de collection manquant"})
         }
 
-        const collectionExist = await mongoose.connection.db.listCollections({name: user}).hasNext()
-
-        if(!collectionExist) {
+        if(!collectionIsCreated(user)) {
             return res.status(404).json({error: "Collection introuvable"})
         }
 
@@ -75,13 +72,11 @@ export const getArticleById = async (req: Request, res: Response, next: NextFunc
             return res.status(400).json({error: "Nom de collection manquant"})
         }
 
-        const collectionExist = await mongoose.connection.db.listCollections({name: user}).hasNext()
-
-        if(!collectionExist) {
+        if(!collectionIsCreated(user)) {
             return res.status(404).json({error: "Collection introuvable"})
         }
 
-        const article = await mongoose.connection.db.collection(user).findOne({_id: new mongoose.Types.ObjectId(id)});
+        const article = await fetchArticle(user, id);
         if(!article) {
             return res.status(404).json({error: "Article introuvable"})
         }
