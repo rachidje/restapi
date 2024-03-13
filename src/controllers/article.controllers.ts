@@ -61,7 +61,7 @@ export const getAllArticles = async (req: Request, res: Response, next: NextFunc
                                 ;
         }
 
-        return res.status(200).json({success: true, data: articles, error: null})
+        return res.status(200).json(articles)
     } catch (error) {
         next(error)
     }
