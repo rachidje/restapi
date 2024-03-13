@@ -9,6 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', apiRouter);
 
-app.listen(8000, () => {
-  console.log('✅ Server started at http://localhost:8000')
+app.listen(process.env.PORT || 8000, () => {
+  console.log('✅ Server started')
 })
