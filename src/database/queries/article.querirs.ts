@@ -10,3 +10,13 @@ export const fetchArticle = async (user: string, id: string) => {
 
     return article
 }
+
+export const fetchArticles = async (user: string, sortBy: any = 'asc') => {
+    const articles = await mongoose.connection.db
+                            .collection(user)
+                            .find()
+                            .sort({"createdAt": sortBy})
+                            .toArray();
+
+    return articles
+}

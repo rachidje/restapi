@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import { CreateArticleInputs } from "../dto";
 import { ArticleModel } from "../database/models/article.model";
-import { collectionIsCreated, fetchArticle } from "../database/queries/article.querirs";
+import { collectionIsCreated, fetchArticle, fetchArticles } from "../database/queries/article.querirs";
 
 
 export const createNewArticle = async (req: Request, res: Response, next: NextFunction) => {
@@ -43,19 +43,11 @@ export const getAllArticles = async (req: Request, res: Response, next: NextFunc
 
         const sortBy: any = req.query.sort;
         if (sortBy) {
-            articles = await mongoose.connection.db
-                                .collection(user)
-                                .find({})
-                                .sort({"createdAt": sortBy})
-                                .toArray()
+            articles = await fetchArticles(user, sortBy)
                                 .then((articles: any) => articles.map((article: any) => new ArticleModel(article)));
         } else {
-            articles = await mongoose.connection.db
-                                .collection(user)
-                                .find({})
-                                .toArray()
-                                .then((articles: any) => articles.map((article: any) => new ArticleModel(article)))
-                                ;
+            articles = await fetchArticles(user)
+                                .then((articles: any) => articles.map((article: any) => new ArticleModel(article)));
         }
 
         return res.status(200).json(articles)
